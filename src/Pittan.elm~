@@ -1,0 +1,72 @@
+module Pittan exposing (..)
+
+import Browser
+import Html exposing (Html)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
+import Svg.Events exposing (..)
+
+main = Browser.element { init = init
+                       , update = update
+                       , view = view
+                       , subscriptions = subscriptions
+                       }
+
+type alias Model = { conf: Conf
+                   }
+
+
+type alias Conf = List Piece
+
+type alias Piece = { x: Int
+                   , y: Int
+                   , c: String
+                   , used: Bool
+                   }
+
+type Msg = PDown {x: Float, y:Float}
+    | PUp {x:Float, y:Float}
+    | PMove {x:Float, y:Float}
+
+unit = 60
+
+init : () -> (Model, Cmd Msg)
+init _ =
+    ( Model []
+    , Cmd.none
+    )
+
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+    (model, Cmd.none)
+
+pieceView : Piece -> Svg Msg
+pieceView piece =
+    svg.g []
+        [ rect [ width (String.fromInt unit)
+               , height (String.fromInt unit)
+               ]
+              []
+        , text_ [ x (String.fromInt (unit//2))
+                , y (String.fromInt (unit//2))
+                , stroke "black"
+                ]
+              [text piece.c]
+        ]
+
+        
+view : Model -> Html Msg
+view model =
+    Html.div []
+        [ svg [ width "1000"
+              , height "1000"
+              ]
+              (List.map pieceView model.conf)
+        ]
+
+subscriptions : Model -> Sub Msg
+subscriptions model = Sub.none
+
+         
+
+      
