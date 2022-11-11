@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>    
+    <meta charset="utf-8">
+    <title>Arai3</title>
+    <script src="arai3.js"></script>
+  </head>
+  <body>
+      <div id="elm"></div>
+      <button type="button" onclick="send()">send</button>
+      <audio id="beep" src="coin01.mp3"></audio>
+      <script>
+      var app = Elm.Arai3.init({
+        node: document.getElementById('elm')
+      });
+      app.ports.play.subscribe(function (data) {
+          var x = document.getElementById("beep");
+          x.play();
+      })
+	function send(){
+	    console.log("send");
+	    console.log(app.ports.fromJS);
+	    app.ports.fromJS.send("aiueo123");
+	}
+      </script>
+    </body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>    
+    <meta charset="utf-8">
+    <title>Pittan</title>
+    <script src="pittan.js"></script>
+  </head>
+  <body>
+      <div id="elm"></div>
+      <audio id="beep" src="src_blackout5.mp3"></audio>
+      <script>
+      var app = Elm.Pittan.init({
+        node: document.getElementById('elm')
+      });
+      app.ports.playSound.subscribe(function (data) {
+          var x = document.getElementById("beep");
+          x.play();
+      })
+      </script>
+    </body>
+</html>

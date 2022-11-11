@@ -1,9 +1,8 @@
-port module Pittan exposing (..)
+module Pittan03 exposing (..)
 
 import Browser
 import Html exposing (Html)
 import Html.Attributes
-import Html.Events
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
@@ -13,7 +12,6 @@ import Dict exposing (Dict)
 import Simple.Animation as Animation exposing (Animation)
 import Simple.Animation.Animated
 import Simple.Animation.Property as Prop
-import Json.Encode as En
 
 main = Browser.element { init = init
                        , update = update
@@ -31,10 +29,8 @@ type alias Model = { conf: Conf
                    , newWordsAt: List (List Cell)
                    , foundWords: List String
                    , completed: Bool
-                   , gameId: Int
                    }
 
-port playSound : En.Value -> Cmd msg    
 
 type alias Conf = List Piece
 
@@ -56,75 +52,59 @@ type Msg = PDown Int {x: Float, y:Float}
     | GenPiece Piece {x:Float, y:Float}
     | CursorPlus
     | CursorMinus
-    | NextGame Int
 
 unit = 60
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( Model [] --initConf
-          [] --aKaraN
-          [] --shikaku
-          {x=0, y=0} {x=0, y=0} Nothing
-          0
+    ( Model initConf
+          aKaraN
+          shikaku
+          {x=0, y=0} {x=0, y=0} Nothing 0
           []
           []
           False
-          -1
     , Cmd.none
     )
 
 initConf : List Piece
-initConf = [Piece 0 3 2 "は" True
-           ,Piece 1 4 2 "あ" True
-           ,Piece 2 5 2 "と" True
+initConf = [Piece 0 6 1 "あ" True
            ]
 
-
+aKaraN : List String
+aKaraN = [ "あ", "あ", "あ", "あ", "か", "か", "か", "さ", "さ", "さ", "た", "た", "た", "な", "な", "な"
+         , "は", "は", "は","ま", "ま", "ま","や", "や", "や","ら", "ら","ら", "わ", "わ", "わ"
+         ]
 
 shikaku : Board
 shikaku  =
+  {-  List.concat <|
+        List.map (\x ->
+                      List.map (\y -> Cell x y) <| List.range 3 4
+                 )
+            <| List.range 3 4 -}
             [
-             {x=3,y=2}
-            ,{x=3,y=3}
-            ,{x=3,y=4}
-            ,{x=3,y=5}
-            ,{x=4,y=1}
-            ,{x=4,y=2}
-            ,{x=4,y=3}
+             {x=3,y=6}
+            ,{x=3,y=7}
             ,{x=4,y=4}
             ,{x=4,y=5}
             ,{x=4,y=6}
-            ,{x=5,y=1}
             ,{x=5,y=2}
             ,{x=5,y=3}
-            ,{x=5,y=6}
+            ,{x=5,y=4}
+            ,{x=5,y=5}
+            ,{x=6,y=1}
             ,{x=6,y=2}
-            ,{x=6,y=3}
-            ,{x=6,y=6}
-            ,{x=6,y=7}
+            ,{x=6,y=5}
+            ,{x=7,y=2}
             ,{x=7,y=3}
-            ,{x=7,y=6}
-            ,{x=7,y=7}
-            ,{x=7,y=8}
-            ,{x=8,y=2}
-            ,{x=8,y=3}
+            ,{x=7,y=4}
+            ,{x=7,y=5}
+            ,{x=8,y=4}
+            ,{x=8,y=5}
             ,{x=8,y=6}
-            ,{x=8,y=7}
-            ,{x=9,y=1}
-            ,{x=9,y=2}
-            ,{x=9,y=3}
             ,{x=9,y=6}
-            ,{x=10,y=1}
-            ,{x=10,y=2}
-            ,{x=10,y=3}
-            ,{x=10,y=4}
-            ,{x=10,y=5}
-            ,{x=10,y=6}
-            ,{x=11,y=2}
-            ,{x=11,y=3}
-            ,{x=11,y=4}
-            ,{x=11,y=5}
+            ,{x=9,y=7}
             ]
 
 
@@ -162,13 +142,9 @@ update msg model =
                 putChars = List.map .c model.conf
                 initialChars = List.map .c initConf
                 removeChar c list =
-                    if model.gameId /= 1 then
-                        List.sort <|
-                            List.append (List.drop 1 (List.filter (\d -> c==d) list))
-                                (List.filter (\d -> c/=d) list)
-                    else
-                        List.append (List.drop 1 (List.filter (\d -> c==d) list))
-                            (List.filter (\d -> c/=d) list)
+                  List.sort <|
+                  List.append (List.drop 1 (List.filter (\d -> c==d) list))
+                  (List.filter (\d -> c/=d) list)
             in
                 ( {model | startedAt = {x=0, y=0}
                   , nowAt = {x=0, y=0}
@@ -178,6 +154,7 @@ update msg model =
                            else
                               List.filter (\p -> p.id /= (Maybe.withDefault (-1) <| model.moving)) model.conf
                   , candidates = if List.length makeWord > 0 then
+                                     --List.foldl (\c list -> removeChar c list) model.candidates putChars
                                      removeChar newlyAddedChar model.candidates
                                  else
                                    model.candidates
@@ -185,10 +162,7 @@ update msg model =
                   , foundWords = model.foundWords ++ newWords
                   , completed = (List.length model.conf) == (List.length model.board)
                   }
-                , if makeWord == [] then
-                      Cmd.none
-                  else
-                      playSound (En.bool True)
+                , Cmd.none
                 )
         GenPiece p pos ->
             ({ model | conf = p::model.conf
@@ -214,18 +188,6 @@ update msg model =
              }
             , Cmd.none
             )
-        NextGame id ->
-            let
-                newCandidate = Maybe.withDefault [] <|List.head <| List.drop (id) initialCandidates
-                newBoard = Maybe.withDefault [] <|List.head <| List.drop (id) boards
-                newConf = Maybe.withDefault [] <|List.head <| List.drop (id) initialConfs
-            in
-                ({model | gameId = model.gameId +1
-                 ,board = newBoard
-                 ,candidates = newCandidate
-                 ,conf = newConf
-                 }
-                ,Cmd.none)
 
 
 valid: Conf -> Cell ->  List (List Cell)
@@ -253,7 +215,7 @@ valid conf cell  =
                                  else
                                      cells
                             )
-                     []  (List.filter (\range -> List.length range > 1) hRanges)
+                     [] hRanges
 
         col = List.sortBy .y <| List.filter (\p -> p.x == cell.x ) conf
         yMin = Basics.min cell.y <| Maybe.withDefault cell.y <| List.minimum <| List.map .y col
@@ -276,10 +238,9 @@ valid conf cell  =
                                              else
                                                  cells
                             )
-                     []  (List.filter (\range -> List.length range > 1) vRanges)
+                     [] vRanges
     in
         List.filter (\range -> List.length range > 1)(hWords++vWords)
-
 
 fromDictionary: Conf -> Cell ->  List String
 fromDictionary conf cell  =
@@ -376,7 +337,8 @@ cellView cell =
          ,height (String.fromInt unit)
          ,stroke "black"
          ,strokeWidth "2px"
-         ,fill "pink"
+         ,fill "red"
+         ,fillOpacity "0.3"
          ][]
 
 boardView : Model -> Svg Msg
@@ -387,10 +349,10 @@ boardView model =
              [rect
                   [ width (String.fromInt unit)
                   , height (String.fromInt unit)
-                  , fill "red"
+                  , fill "orange"
                   , fillOpacity "0.3"
                   , stroke "yellow"
-                  , strokeWidth "5px"
+                  , strokeWidth "8px"
                   ][]
               ]
 
@@ -452,65 +414,47 @@ candView model =
                       , onClick CursorMinus
                       ]
                  []
+
             ]
 
-radioButton1 : Int -> String -> Html Msg
-radioButton1  gameId label =
-    Html.label []
-        [ Html.input
-            [ Html.Attributes.type_ "radio"
-            , Html.Attributes.name "games"
-            , Html.Events.onClick (NextGame gameId)
-            ]
-            []
-        , text label
-        ]
-        
+
+
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.div[][ radioButton1 0 "ハート"
-                    , radioButton1 1 "いろは"
-                    , radioButton1 2 "A"
-                    ]
-        ,(if model.gameId >= 0 && model.gameId < 3 then
-              (svg [ width "800"
-                   , height "800"
-                   , P.onMove (\event -> PMove
-                                   { x=Tuple.first event.pointer.offsetPos
-                                   , y=Tuple.second event.pointer.offsetPos
-                                   }
-                              )
-                    , P.onUp (\event -> PUp
-                                  { x=Tuple.first event.pointer.offsetPos
-                                  , y=Tuple.second event.pointer.offsetPos
-                                  }
-                             )
-                    ]
-                    (
-                     [boardView model] ++
-                         [Svg.clipPath [id "candClip"]
-                              [ rect [x "0"
-                                     ,y "0"
-                                     ,width (String.fromInt unit)
-                                     ,height (String.fromInt (8*unit))
-                                     ][]
-                              , Svg.path [d "M 0 0 l 100 0 l 0 480 l -100 0 Z"][]
-                              ]
-                         ] ++
-                         [candView model] ++
-                         (List.map (\p -> pieceView p model) model.conf) ++
-                         [Svg.text_ [x "300"
-                                    ,y "200"
-                                    ,fontSize "170"][if model.completed then
-                                                         Html.text "💯"
-                                                     else
-                                                         Html.text ""]]
-                    ) 
-               )
-              else
-                  Html.text ""
-          )
+        [ svg [ width "800"
+              , height "800"
+              , P.onMove (\event -> PMove
+                              { x=Tuple.first event.pointer.offsetPos
+                              , y=Tuple.second event.pointer.offsetPos
+                              }
+                         )
+              , P.onUp (\event -> PUp
+                                { x=Tuple.first event.pointer.offsetPos
+                                , y=Tuple.second event.pointer.offsetPos
+                                }
+                          )
+              ]
+              (
+               [boardView model] ++
+                   [Svg.clipPath [id "candClip"]
+                        [ rect [x "0"
+                               ,y "0"
+                               ,width (String.fromInt unit)
+                               ,height (String.fromInt (8*unit))
+                               ][]
+                        , Svg.path [d "M 0 0 l 100 0 l 0 480 l -100 0 Z"][]
+                        ]
+                   ] ++
+                   [candView model] ++
+                   (List.map (\p -> pieceView p model) model.conf) ++
+                   [Svg.text_ [x "300"
+                              ,y "200"
+                              ,fontSize "170"][if model.completed then
+                                                Html.text "💯"
+                                               else
+                                                 Html.text ""]]
+              )
         , Html.ul [] (List.map (\w -> Html.li [][Html.text w]) model.foundWords)
         ]
 
@@ -570,130 +514,3 @@ animatedCover =
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
-
-
-initialCandidates = [[ "あ", "あ", "あ", "ぁ", "い", "ぃ", "う", "ぅ", "え", "ぇ", "お", "ぉ"
-                     , "か", "き", "く", "け", "こ"
-                     , "さ", "し", "す", "せ", "そ"
-                     , "た", "ち", "つ", "っ", "て", "と"
-                     , "な", "に", "ぬ", "ね", "の"
-                     , "は", "ひ", "ふ", "へ", "ほ"
-                     , "ま", "み", "む", "め", "も"
-                     , "や", "ゃ", "ゆ", "ゅ", "よ", "ょ"
-                     , "ら", "り", "る", "れ", "ろ"
-                     , "わ"
-                     , "ん"
-                     , "が", "ぎ", "ぐ", "げ", "ご"
-                     , "ざ", "じ", "ず", "ぜ", "ぞ"
-                     , "だ", "ぢ", "づ", "で", "ど"
-                     , "ば", "び", "ぶ", "べ", "ぼ"
-                     , "ぱ", "ぴ", "ぷ", "ぺ", "ぽ"
-                     ]
-                    ,[ "い", "ろ", "は", "に", "ほ", "へ", "と"
-                     , "ち", "り", "ぬ", "る", "を"
-                     , "わ", "か", "よ", "た", "れ", "そ", "つ", "ね", "な", "ら", "ん"
-                     , "う", "の", "お", "く", "や", "ま", "け", "ふ", "こ", "え", "て"
-                     , "あ", "さ", "き", "ゆ", "め", "み", "し", "よ", "ひ", "も", "せ", "す"
-                     , "ん"
-                     ]
-                    ,[ "あ", "あ", "あ", "あ", "か", "か", "か", "さ", "さ", "さ", "た", "た", "た", "な", "な", "な"
-                     , "は", "は", "は","ま", "ま", "ま","や", "や", "や","ら", "ら","ら", "わ", "わ", "わ"
-                     ]
-                    ]
-
-boards = [[{x=3,y=2}
-                ,{x=3,y=3}
-                ,{x=3,y=4}
-                ,{x=3,y=5}
-                ,{x=4,y=1}
-                ,{x=4,y=2}
-                ,{x=4,y=3}
-                ,{x=4,y=4}
-                ,{x=4,y=5}
-                ,{x=4,y=6}
-                ,{x=5,y=1}
-                ,{x=5,y=2}
-                ,{x=5,y=3}
-                ,{x=5,y=6}
-                ,{x=6,y=2}
-                ,{x=6,y=3}
-                ,{x=6,y=6}
-                ,{x=6,y=7}
-                ,{x=7,y=3}
-                ,{x=7,y=6}
-                ,{x=7,y=7}
-                ,{x=7,y=8}
-                ,{x=8,y=2}
-                ,{x=8,y=3}
-                ,{x=8,y=6}
-                ,{x=8,y=7}
-                ,{x=9,y=1}
-                ,{x=9,y=2}
-                ,{x=9,y=3}
-                ,{x=9,y=6}
-                ,{x=10,y=1}
-                ,{x=10,y=2}
-                ,{x=10,y=3}
-                ,{x=10,y=4}
-                ,{x=10,y=5}
-                ,{x=10,y=6}
-                ,{x=11,y=2}
-                ,{x=11,y=3}
-                ,{x=11,y=4}
-                ,{x=11,y=5}
-                ]
-               ,[{x=3,y=1}
-                ,{x=3,y=2}
-                ,{x=4,y=2}
-                ,{x=4,y=3}
-                ,{x=4,y=4}
-                ,{x=5,y=3}
-                ,{x=5,y=4}
-                ,{x=5,y=5}
-                ,{x=6,y=5}
-                ,{x=6,y=6}
-                ,{x=7,y=4}
-                ,{x=7,y=5}
-                ,{x=9,y=1}
-                ,{x=9,y=2}
-                ,{x=10,y=2}
-                ,{x=10,y=3}
-                ,{x=11,y=3}
-                ,{x=11,y=4}
-                ,{x=11,y=5}
-                ]
-               ,[{x=3,y=6}
-                ,{x=3,y=7}
-                ,{x=4,y=4}
-                ,{x=4,y=5}
-                ,{x=4,y=6}
-                ,{x=5,y=2}
-                ,{x=5,y=3}
-                ,{x=5,y=4}
-                ,{x=5,y=5}
-                ,{x=6,y=1}
-                ,{x=6,y=2}
-                ,{x=6,y=5}
-                ,{x=7,y=2}
-                ,{x=7,y=3}
-                ,{x=7,y=4}
-                ,{x=7,y=5}
-                ,{x=8,y=4}
-                ,{x=8,y=5}
-                ,{x=8,y=6}
-                ,{x=9,y=6}
-                ,{x=9,y=7}
-                ]
-               ]
-
-initialConfs = [[Piece 0 3 2 "は" True
-                ,Piece 1 4 2 "あ" True
-                ,Piece 2 5 2 "と" True
-                ]
-               ,[Piece 0 3 1 "い" True
-                ,Piece 0 9 1 "ろ" True
-                ]
-               ,[Piece 0 6 1 "あ" True
-                ]
-               ]
-                    
