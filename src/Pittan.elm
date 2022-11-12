@@ -469,10 +469,11 @@ radioButton1  gameId label =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.div[][ radioButton1 0 "ハート"
-                    , radioButton1 1 "いろは"
-                    , radioButton1 2 "A"
-                    ]
+        [ Html.div[Html.Attributes.style "touch-action" "none"]
+              [ radioButton1 0 "ハート"
+              , radioButton1 1 "いろは"
+              , radioButton1 2 "A"
+              ]
         ,(if model.gameId >= 0 && model.gameId < 3 then
               (svg [ width "800"
                    , height "800"
@@ -486,7 +487,6 @@ view model =
                                   , y=Tuple.second event.pointer.offsetPos
                                   }
                              )
-                   ,Html.Attributes.style "touch-action" "none"
                    ]
                    (
                     [boardView model] ++

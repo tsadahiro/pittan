@@ -26880,7 +26880,10 @@ var $author$project$Pittan$view = function (model) {
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
+					]),
 				_List_fromArray(
 					[
 						A2($author$project$Pittan$radioButton1, 0, 'ハート'),
@@ -26902,8 +26905,7 @@ var $author$project$Pittan$view = function (model) {
 						function (event) {
 							return $author$project$Pittan$PUp(
 								{x: event.pointer.offsetPos.a, y: event.pointer.offsetPos.b});
-						}),
-						A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
+						})
 					]),
 				_Utils_ap(
 					_List_fromArray(
