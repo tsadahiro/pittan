@@ -25515,7 +25515,7 @@ var $author$project$Pittan$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{board: newBoard, candidates: newCandidate, conf: newConf, gameId: id}),
+						{board: newBoard, candidates: newCandidate, conf: newConf, cursor: 0, foundWords: _List_Nil, gameId: id, moving: $elm$core$Maybe$Nothing, newWordsAt: _List_Nil}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});

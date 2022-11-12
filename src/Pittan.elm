@@ -224,6 +224,10 @@ update msg model =
                  ,board = newBoard
                  ,candidates = newCandidate
                  ,conf = newConf
+                 ,cursor = 0
+                 ,foundWords = []
+                 ,newWordsAt = []
+                 ,moving = Nothing
                  }
                 ,Cmd.none)
 
