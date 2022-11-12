@@ -26875,15 +26875,15 @@ var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Pittan$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
+			]),
 		_List_fromArray(
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
-					]),
+				_List_Nil,
 				_List_fromArray(
 					[
 						A2($author$project$Pittan$radioButton1, 0, 'ハート'),

@@ -468,8 +468,8 @@ radioButton1  gameId label =
         
 view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.div[Html.Attributes.style "touch-action" "none"]
+    Html.div [Html.Attributes.style "touch-action" "none"]
+        [ Html.div[]
               [ radioButton1 0 "ハート"
               , radioButton1 1 "いろは"
               , radioButton1 2 "A"
