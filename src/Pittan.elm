@@ -486,9 +486,10 @@ view model =
                                   , y=Tuple.second event.pointer.offsetPos
                                   }
                              )
-                    ]
-                    (
-                     [boardView model] ++
+                   ,Html.Attributes.style "touch-action" "none"
+                   ]
+                   (
+                    [boardView model] ++
                          [Svg.clipPath [id "candClip"]
                               [ rect [x "0"
                                      ,y "0"

@@ -26868,6 +26868,8 @@ var $author$project$Pittan$radioButton1 = F2(
 					$elm$svg$Svg$text(label)
 				]));
 	});
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Pittan$view = function (model) {
@@ -26900,7 +26902,8 @@ var $author$project$Pittan$view = function (model) {
 						function (event) {
 							return $author$project$Pittan$PUp(
 								{x: event.pointer.offsetPos.a, y: event.pointer.offsetPos.b});
-						})
+						}),
+						A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
 					]),
 				_Utils_ap(
 					_List_fromArray(
