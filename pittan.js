@@ -25515,7 +25515,7 @@ var $author$project$Pittan$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{board: newBoard, candidates: newCandidate, conf: newConf, gameId: model.gameId + 1}),
+						{board: newBoard, candidates: newCandidate, conf: newConf, gameId: id}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});

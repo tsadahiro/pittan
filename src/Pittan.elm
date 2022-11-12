@@ -220,7 +220,7 @@ update msg model =
                 newBoard = Maybe.withDefault [] <|List.head <| List.drop (id) boards
                 newConf = Maybe.withDefault [] <|List.head <| List.drop (id) initialConfs
             in
-                ({model | gameId = model.gameId +1
+                ({model | gameId = id
                  ,board = newBoard
                  ,candidates = newCandidate
                  ,conf = newConf
